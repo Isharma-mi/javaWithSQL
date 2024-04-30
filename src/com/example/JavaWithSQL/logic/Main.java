@@ -11,6 +11,7 @@ public class Main {
 	// TODO: Implement removing records from Java into SQL
 	// TODO: Implement viewing of tables from SQL into Java
 	public static void main(String[] args) {
+		// Create UI obj for user to interact with
 		final UserInterface ui = new UserInterface();
 		// Create SQLInteractor obj here so we can use it after try block
 		SQLInteractor sqlInteractor = null;
@@ -29,6 +30,7 @@ public class Main {
 			e.printStackTrace();
 		}
 		
+		// For repeatedly asking user what they want to do
 		while (true) {
 			// Can pass in sqlInteractor safely since it can not be null at this pt
 			ui.menuOptions(sqlInteractor);

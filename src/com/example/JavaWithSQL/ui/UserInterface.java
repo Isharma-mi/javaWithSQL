@@ -47,19 +47,25 @@ public class UserInterface {
 	 * Asks the user what they want to do in the database of the server.
 	 * Calls different methods depending on what user selects
 	 * Supposed to be used only after connection to database has been established.
+	 * @param sqlInteractor sends queries SQL queries from java
 	 */
 	public void menuOptions(SQLInteractor sqlInteractor) {
-		System.out.println("------------------------What would you like to do?------------------------");
+		// Asks and gives users options on what to do
+		System.out.println("\n------------------------What would you like to do?------------------------");
 		System.out.println("1. View tables in database "
 				+ "\n2. Create table in database"
 				+ "\n3. Create record for a table"
 				+ "\n4. Delete record from a table");
 		
+		// Gets option user wants
 		String optionSelected = scanner.nextLine().trim();
 		
 		if (optionSelected.matches("[1234]")) {
+			// Verifies a valid option was given
 			switch (optionSelected) {
 				case "1":
+					// See what tables are in the database
+					sqlInteractor.viewTablesQuery();
 					break;
 				case "2":
 					break;
