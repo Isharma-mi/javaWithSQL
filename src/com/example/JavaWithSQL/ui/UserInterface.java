@@ -67,7 +67,41 @@ public class UserInterface {
 					// See what tables are in the database
 					sqlInteractor.viewTablesQuery();
 					break;
-				case "2":
+				case "2":					
+					// Get new table's name
+					System.out.println("What is the table's name?");
+					String tableName = this.scanner.nextLine().trim();
+
+					if (sqlInteractor.checkTableExists(tableName)) {
+						// Return to menu if table already exists
+						System.out.println("ERROR: Table already exists.");
+						break;
+					}
+
+					// Get number of columns
+					System.out.println("How many columns will there be?");
+					String numColumnsInputted = this.scanner.nextLine();
+					
+					if (!numColumnsInputted.matches("[0123456789]+")) {
+						// Return to menu if invalid num of columns given
+						System.out.println("ERROR: Please give valid number of columns.");
+						break;
+					}
+					
+					// Converts string input of number of columns to an int
+					int numOfColumns = Integer.parseInt(numColumnsInputted);
+					// Array that will store the information of the columns
+					String[] columns = new String[numOfColumns];
+					
+					for (int i = 0; i < numOfColumns; i++) {
+						// Asks user for each column's information one at a time
+						System.out.println("What is the column's information? Start with IDENTITY column."
+								+ " Format it similar to SQL (ex: column_name datatype)");
+						columns[i] = scanner.nextLine().trim();
+					}
+					
+					// Attempts to create the table in SQL
+					sqlInteractor.createTableQuery(tableName, columns);
 					break;
 				case "3":
 					break;
