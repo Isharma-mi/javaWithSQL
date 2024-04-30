@@ -1,13 +1,14 @@
 package com.example.JavaWithSQL.ui;
 
 import java.util.Scanner;
+import com.example.JavaWithSQL.logic.SQLInteractor;
 
 public class UserInterface {
 	
 	final private Scanner scanner;
 	
 	public UserInterface() {
-		scanner = new Scanner(System.in);
+		this.scanner = new Scanner(System.in);
 	}
 	
 	/**
@@ -40,5 +41,38 @@ public class UserInterface {
 		String pass = this.scanner.nextLine().trim();
 		
 		return new String[] {user, pass};
+	}
+	
+	/**
+	 * Asks the user what they want to do in the database of the server.
+	 * Calls different methods depending on what user selects
+	 * Supposed to be used only after connection to database has been established.
+	 */
+	public void menuOptions(SQLInteractor sqlInteractor) {
+		System.out.println("------------------------What would you like to do?------------------------");
+		System.out.println("1. View tables in database "
+				+ "\n2. Create table in database"
+				+ "\n3. Create record for a table"
+				+ "\n4. Delete record from a table");
+		
+		String optionSelected = scanner.nextLine().trim();
+		
+		if (optionSelected.matches("[1234]")) {
+			switch (optionSelected) {
+				case "1":
+					break;
+				case "2":
+					break;
+				case "3":
+					break;
+				case "4":
+					break;
+				default: 
+					System.out.println("ERROR: Please give valid option");
+			}
+		} else {
+			System.out.println("ERROR: Invalid option given!");
+		}
+		
 	}
 }
