@@ -5,6 +5,7 @@ import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.ResultSetMetaData;
 
 public class SQLInteractor {
 	private final Connection connection;
@@ -13,6 +14,7 @@ public class SQLInteractor {
 	
 	public SQLInteractor(Connection connection) {
 		this.connection = connection;
+
 	}
 	
 	/**
@@ -67,6 +69,44 @@ public class SQLInteractor {
 	}
 	
 	/**
+	 * Adds a record to an existing table in SQL server's database.
+	 */
+	public void addRecordToTable(String tableName) {
+		// TODO: Get table name and verify if it exists in UI
+		// TODO: Get the column information
+		// TODO: Get user to input info for each column
+
+		StringBuilder cmd = new StringBuilder();
+		
+		cmd.append("SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '");
+			cmd.append(tableName);
+			cmd.append("';");
+		try {
+			// Gets each column's name as sep rows under the column header COLUMN_NAME
+			this.pstmnt = this.connection.prepareStatement(cmd.toString(), ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+			this.rs = this.pstmnt.executeQuery();
+
+			// Used to get the total number of rows by pointing to the last row 
+			this.rs.last();
+			
+			// Puts cursor right before the first row 
+			// Done since .next() will push cursor to first row at beginning of loop 
+			this.rs.beforeFirst();
+
+			// Loop through each column's name ()
+			while (rs.next()) {
+				// Prints out the column's name
+				System.out.println(this.rs.getString(1));
+			}
+		} catch (SQLException e) {
+			System.out.println("ERROR: Unable to get column headers information from table");
+			e.printStackTrace();
+		}
+		
+
+	}
+	
+	/**
 	 * Checks if a given table name is already in the SQL server's database.
 	 * @param tableName table whose existence is checked for
 	 * @return
@@ -90,4 +130,5 @@ public class SQLInteractor {
 		
 		return tableExists;
 	}
+
 }

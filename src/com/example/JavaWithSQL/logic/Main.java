@@ -6,11 +6,14 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 public class Main {
-	// TODO: Implement table creation from Java into SQL
 	// TODO: Implement adding records from Java into SQL
 	// TODO: Implement removing records from Java into SQL
-	// TODO: Implement viewing of tables from SQL into Java
 	public static void main(String[] args) {
+		// TESTING BEGINS HERE
+		TestingClass tester = new TestingClass();
+		tester.testingStuff();
+		// TESTING ENDS HERE
+		
 		// Create UI obj for user to interact with
 		final UserInterface ui = new UserInterface();
 		// Create SQLInteractor obj here so we can use it after try block
@@ -35,5 +38,8 @@ public class Main {
 			// Can pass in sqlInteractor safely since it can not be null at this pt
 			ui.menuOptions(sqlInteractor);
 		}
+	
+		
+
 	}
 }
