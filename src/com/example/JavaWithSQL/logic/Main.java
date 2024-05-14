@@ -14,6 +14,8 @@ public class Main {
 		tester.testingStuff();
 		// TESTING ENDS HERE
 		
+		/*
+		
 		// Create UI obj for user to interact with
 		final UserInterface ui = new UserInterface();
 		// Create SQLInteractor obj here so we can use it after try block
@@ -39,7 +41,7 @@ public class Main {
 			ui.menuOptions(sqlInteractor);
 		}
 	
-		
+		*/
 
 	}
 }

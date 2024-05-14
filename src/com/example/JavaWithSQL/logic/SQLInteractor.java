@@ -72,38 +72,51 @@ public class SQLInteractor {
 	 * Adds a record to an existing table in SQL server's database.
 	 */
 	public void addRecordToTable(String tableName) {
-		// TODO: Get table name and verify if it exists in UI
-		// TODO: Get the column information
+		// TODO: Get table name and verify if it exists in UI class
 		// TODO: Get user to input info for each column
-
+		
+		// Initialize to null since want to use it outside of try-catch if successfully get column names
+		String[] columns = null;
 		StringBuilder cmd = new StringBuilder();
 		
-		cmd.append("SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '");
+		cmd.append("SELECT c.name FROM sys.columns AS C"
+				+ "\n JOIN sys.tables AS t"
+				+ "\n ON t.object_id = c.object_id"
+				+ "\n WHERE c.name NOT IN(SELECT name FROM sys.identity_columns WHERE is_identity=1)"
+				+ "\n AND t.name = '");
 			cmd.append(tableName);
 			cmd.append("';");
+			
 		try {
 			// Gets each column's name as sep rows under the column header COLUMN_NAME
 			this.pstmnt = this.connection.prepareStatement(cmd.toString(), ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
 			this.rs = this.pstmnt.executeQuery();
 
-			// Used to get the total number of rows by pointing to the last row 
+			// Puts cursor at last row of result set 
 			this.rs.last();
+			// Gets the id of last row -> Can be used to check number of columns in table
+			int numColumns= this.rs.getRow();
+			// Creates array to store column names
+			columns = new String[numColumns];
 			
 			// Puts cursor right before the first row 
 			// Done since .next() will push cursor to first row at beginning of loop 
 			this.rs.beforeFirst();
 
-			// Loop through each column's name ()
+			// Used to store column names
+			int tracker = 0;
+			// Loop through each column's name
 			while (rs.next()) {
-				// Prints out the column's name
-				System.out.println(this.rs.getString(1));
+				// Adds column name to array
+				columns[tracker++] = this.rs.getString(1);
 			}
 		} catch (SQLException e) {
 			System.out.println("ERROR: Unable to get column headers information from table");
 			e.printStackTrace();
 		}
-		
-
+		for (String s: columns) {
+			System.out.println(s);
+		}
 	}
 	
 	/**
