@@ -68,42 +68,10 @@ public class UserInterface {
 					sqlInteractor.viewTablesQuery();
 					break;
 				case "2":					
-					// Get new table's name
-					System.out.println("What is the table's name?");
-					String tableName = this.scanner.nextLine().trim();
-
-					if (sqlInteractor.checkTableExists(tableName)) {
-						// Return to menu if table already exists
-						System.out.println("ERROR: Table already exists.");
-						break;
-					}
-
-					// Get number of columns
-					System.out.println("How many columns will there be?");
-					String numColumnsInputted = this.scanner.nextLine();
-					
-					if (!numColumnsInputted.matches("[0123456789]+")) {
-						// Return to menu if invalid num of columns given
-						System.out.println("ERROR: Please give valid number of columns.");
-						break;
-					}
-					
-					// Converts string input of number of columns to an int
-					int numOfColumns = Integer.parseInt(numColumnsInputted);
-					// Array that will store the information of the columns
-					String[] columns = new String[numOfColumns];
-					
-					for (int i = 0; i < numOfColumns; i++) {
-						// Asks user for each column's information one at a time
-						System.out.println("What is the column's information? Start with IDENTITY column."
-								+ " Format it similar to SQL (ex: column_name datatype)");
-						columns[i] = scanner.nextLine().trim();
-					}
-					
-					// Attempts to create the table in SQL
-					sqlInteractor.createTableQuery(tableName, columns);
+					createTable(sqlInteractor);
 					break;
 				case "3":
+					addRecordToTable(sqlInteractor);
 					break;
 				case "4":
 					break;
@@ -113,6 +81,63 @@ public class UserInterface {
 		} else {
 			System.out.println("ERROR: Invalid option given!");
 		}
+	}
+	
+	/**
+	 * Creates a table in sql based off user input in java.
+	 * @param sqlInteractor executes sql queries from java
+	 */
+	private void createTable(SQLInteractor sqlInteractor) {
+		// Get new table's name
+		System.out.println("What is the table's name?");
+		String tableName = this.scanner.nextLine().trim();
+
+		if (sqlInteractor.checkTableExists(tableName)) {
+			// Return to menu if table already exists
+			System.out.println("ERROR: Table already exists.");
+			return;
+		}
+
+		// Get number of columns
+		System.out.println("How many columns will there be?");
+		String numColumnsInputted = this.scanner.nextLine();
 		
+		if (!numColumnsInputted.matches("[0123456789]+")) {
+			// Return to menu if invalid num of columns given
+			System.out.println("ERROR: Please give valid number of columns.");
+			return;
+		}
+		
+		// Converts string input of number of columns to an int
+		int numOfColumns = Integer.parseInt(numColumnsInputted);
+		// Array that will store the information of the columns
+		String[] columns = new String[numOfColumns];
+		
+		for (int i = 0; i < numOfColumns; i++) {
+			// Asks user for each column's information one at a time
+			System.out.println("What is the column's information? Start with IDENTITY column."
+					+ " Format it similar to SQL (ex: column_name datatype)");
+			columns[i] = scanner.nextLine().trim();
+		}
+		
+		// Attempts to create the table in SQL
+		sqlInteractor.createTableQuery(tableName, columns);
+	}
+
+	/**
+	 * Adds records to a table based off user input in java
+	 * @param sqlInteractor executes sql queries from java
+	 */
+	private void addRecordToTable(SQLInteractor sqlInteractor) {
+		// Adds a record to a specific table
+		System.out.println("What is the table's name?");
+		String tableToAddTo = this.scanner.nextLine().trim();
+		
+		// Stops trying to add a record if table does not exist
+		if (!sqlInteractor.checkTableExists(tableToAddTo)) {
+			System.out.println("ERROR: Table does not exist.");
+			return;
+		}
+		String[] columns = sqlInteractor.getColumnsOfTable(tableToAddTo);
 	}
 }

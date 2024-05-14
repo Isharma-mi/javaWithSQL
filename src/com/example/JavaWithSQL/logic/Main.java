@@ -9,12 +9,13 @@ public class Main {
 	// TODO: Implement adding records from Java into SQL
 	// TODO: Implement removing records from Java into SQL
 	public static void main(String[] args) {
+	/*
 		// TESTING BEGINS HERE
 		TestingClass tester = new TestingClass();
 		tester.testingStuff();
 		// TESTING ENDS HERE
 		
-		/*
+		*/
 		
 		// Create UI obj for user to interact with
 		final UserInterface ui = new UserInterface();
@@ -40,8 +41,5 @@ public class Main {
 			// Can pass in sqlInteractor safely since it can not be null at this pt
 			ui.menuOptions(sqlInteractor);
 		}
-	
-		*/
-
 	}
 }

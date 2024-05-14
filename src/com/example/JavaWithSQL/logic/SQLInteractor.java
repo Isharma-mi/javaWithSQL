@@ -71,14 +71,22 @@ public class SQLInteractor {
 	/**
 	 * Adds a record to an existing table in SQL server's database.
 	 */
-	public void addRecordToTable(String tableName) {
+	public void addRecordToTable(String tableName, String[] columns) {
 		// TODO: Get table name and verify if it exists in UI class
-		// TODO: Get user to input info for each column
-		
-		// Initialize to null since want to use it outside of try-catch if successfully get column names
+		// TODO: Get user to input info for each column in UI and send info as a parameter
+	}
+	
+	/**
+	 * Finds the column names of a given table.
+	 * Separate method since need to ask user about each column individually they will add values to
+	 * @param tableName specifies from which table user wants the columns
+	 * @return array containing the table's columns
+	 */
+	public String[] getColumnsOfTable(String tableName) {
 		String[] columns = null;
 		StringBuilder cmd = new StringBuilder();
 		
+		// SQL query that gets all the column names EXCEPT identity for specified table
 		cmd.append("SELECT c.name FROM sys.columns AS C"
 				+ "\n JOIN sys.tables AS t"
 				+ "\n ON t.object_id = c.object_id"
@@ -88,7 +96,7 @@ public class SQLInteractor {
 			cmd.append("';");
 			
 		try {
-			// Gets each column's name as sep rows under the column header COLUMN_NAME
+			// Loads query from above into PreparedStatement (Insensitive allows for us to move cursor)
 			this.pstmnt = this.connection.prepareStatement(cmd.toString(), ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
 			this.rs = this.pstmnt.executeQuery();
 
@@ -114,9 +122,7 @@ public class SQLInteractor {
 			System.out.println("ERROR: Unable to get column headers information from table");
 			e.printStackTrace();
 		}
-		for (String s: columns) {
-			System.out.println(s);
-		}
+		return columns;
 	}
 	
 	/**
