@@ -131,13 +131,27 @@ public class UserInterface {
 	private void addRecordToTable(SQLInteractor sqlInteractor) {
 		// Adds a record to a specific table
 		System.out.println("What is the table's name?");
-		String tableToAddTo = this.scanner.nextLine().trim();
+		String tableName  = this.scanner.nextLine().trim();
 		
 		// Stops trying to add a record if table does not exist
-		if (!sqlInteractor.checkTableExists(tableToAddTo)) {
+		if (!sqlInteractor.checkTableExists(tableName)) {
 			System.out.println("ERROR: Table does not exist.");
 			return;
 		}
-		String[] columns = sqlInteractor.getColumnsOfTable(tableToAddTo);
+		
+		// Stores column names
+		String[] columns = sqlInteractor.getColumnsOfTable(tableName);
+		// Stores the values user wants to add for record
+		String[] columnValues = new String[columns.length];
+		
+		// Gets the values user wants to add for each column for the record
+		for (int i = 0; i < columns.length; i++) {
+			System.out.println("For column: " + columns[i] + ", what do you want to add?");
+			// Gets the value
+			String columnValue = scanner.nextLine().trim();
+			// Stores the value
+			columnValues[i] = columnValue;
+		}
+		sqlInteractor.addRecordToTable(tableName, columns, columnValues);
 	}
 }

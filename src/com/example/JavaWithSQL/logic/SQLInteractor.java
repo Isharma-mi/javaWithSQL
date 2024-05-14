@@ -63,7 +63,7 @@ public class SQLInteractor {
 			this.pstmnt = this.connection.prepareStatement(cmd.toString());
 			this.pstmnt.execute();
 		} catch (SQLException e) {
-			System.out.println("ERROR: Unable to create table");
+			System.out.println("ERROR: Unable to create table!");
 			e.printStackTrace();
 		}
 	}
@@ -71,9 +71,46 @@ public class SQLInteractor {
 	/**
 	 * Adds a record to an existing table in SQL server's database.
 	 */
-	public void addRecordToTable(String tableName, String[] columns) {
-		// TODO: Get table name and verify if it exists in UI class
-		// TODO: Get user to input info for each column in UI and send info as a parameter
+	public void addRecordToTable(String tableName, String[] columns, String[] columnValues) {
+		StringBuilder cmd =  new StringBuilder();
+
+		// Specifies which table we want to insert into
+		cmd.append("INSERT INTO "); 
+		cmd.append(tableName);
+		cmd.append(" (");
+		
+		// Adds column names to cmd
+		for (int i = 0; i < columns.length; i++) {
+			cmd.append(columns[i]);
+			
+			// Checks that there are more elements to add
+			if (!(i == columns.length-1)) {
+				cmd.append(",");
+			}
+		}
+		// Adds values to cmd
+		cmd.append(") VALUES (");
+		for (int i = 0; i < columnValues.length; i++) {
+			// Used mainly for String values
+			// Works with ints as well (do it for all types to reduce code w/o negative impact)
+			cmd.append("'");
+			cmd.append(columnValues[i]);
+			cmd.append("'");
+			
+			// Checks that there are more elements to add
+			if (!(i == columnValues.length - 1)) {
+				cmd.append(",");
+			}
+		}
+		cmd.append(")");
+		
+		try {
+			this.pstmnt = this.connection.prepareStatement(cmd.toString());
+			this.pstmnt.execute();
+		} catch (SQLException e) {
+			System.out.println("ERROR: Unable to add record with given information!");
+			e.printStackTrace();
+		}
 	}
 	
 	/**
