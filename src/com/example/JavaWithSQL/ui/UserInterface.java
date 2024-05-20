@@ -53,9 +53,10 @@ public class UserInterface {
 		// Asks and gives users options on what to do
 		System.out.println("\n------------------------What would you like to do?------------------------");
 		System.out.println("1. View tables in database "
-				+ "\n2. Create table in database"
-				+ "\n3. Create record for a table"
-				+ "\n4. Delete record from a table");
+				+ "\n2. Create table in database "
+				+ "\n3. Delete table from database"
+				+ "\n4. Create record for a table"
+				+ "\n5. Delete record from a table");
 		
 		// Gets option user wants
 		String optionSelected = scanner.nextLine().trim();
@@ -71,9 +72,10 @@ public class UserInterface {
 					createTable(sqlInteractor);
 					break;
 				case "3":
-					addRecordToTable(sqlInteractor);
+					deleteTable(sqlInteractor);
 					break;
 				case "4":
+					addRecordToTable(sqlInteractor);
 					break;
 				default: 
 					System.out.println("ERROR: Please give valid option");
@@ -124,6 +126,19 @@ public class UserInterface {
 		sqlInteractor.createTableQuery(tableName, columns);
 	}
 
+	private void deleteTable(SQLInteractor sqlInteractor) {
+		// Gets name of table user wants to delete
+		System.out.println("What table would you like to delete?");
+		String tableName = this.scanner.nextLine().trim();
+	
+		// Checks that the table does exist
+		if (sqlInteractor.checkTableExists(tableName)) {
+			sqlInteractor.deleteTable(tableName);
+		} else {
+			System.out.println("ERROR: Table already does NOT exist");
+		}
+	}
+	
 	/**
 	 * Adds records to a table based off user input in java
 	 * @param sqlInteractor executes sql queries from java

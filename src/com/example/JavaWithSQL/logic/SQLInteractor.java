@@ -62,11 +62,32 @@ public class SQLInteractor {
 		try {
 			this.pstmnt = this.connection.prepareStatement(cmd.toString());
 			this.pstmnt.execute();
+			System.out.println(tableName + " table was created successfully");
 		} catch (SQLException e) {
 			System.out.println("ERROR: Unable to create table!");
 			e.printStackTrace();
 		}
 	}
+	
+	/**
+	 * Deletes a table from the database specified by the user
+	 * @param tableName used to find table to delete
+	 */
+	public void deleteTable(String tableName) {
+		// Create obj that will store query to delete table
+		StringBuilder cmd = new StringBuilder();
+		cmd.append("DROP TABLE " + tableName);
+		
+		try {
+			this.pstmnt = this.connection.prepareStatement(cmd.toString());
+			this.pstmnt.execute();
+			System.out.println(tableName + " table was deleted succesfully!");
+		} catch (SQLException e) {
+			System.out.println("ERROR: Unable to delete table!");
+			e.printStackTrace();
+		}
+	} 
+	
 	
 	/**
 	 * Adds a record to an existing table in SQL server's database.
@@ -107,6 +128,7 @@ public class SQLInteractor {
 		try {
 			this.pstmnt = this.connection.prepareStatement(cmd.toString());
 			this.pstmnt.execute();
+			System.out.println("Record was added to " + tableName + " successfully!");
 		} catch (SQLException e) {
 			System.out.println("ERROR: Unable to add record with given information!");
 			e.printStackTrace();
