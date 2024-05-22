@@ -1,5 +1,6 @@
 package com.example.JavaWithSQL.ui;
 
+import java.util.Arrays;
 import java.util.Scanner;
 import com.example.JavaWithSQL.logic.SQLInteractor;
 
@@ -61,7 +62,7 @@ public class UserInterface {
 		// Gets option user wants
 		String optionSelected = scanner.nextLine().trim();
 		
-		if (optionSelected.matches("[1234]")) {
+		if (optionSelected.matches("[12345]")) {
 			// Verifies a valid option was given
 			switch (optionSelected) {
 				case "1":
@@ -76,6 +77,9 @@ public class UserInterface {
 					break;
 				case "4":
 					addRecordToTable(sqlInteractor);
+					break;
+				case "5":
+					deleteRecordFromTable(sqlInteractor);
 					break;
 				default: 
 					System.out.println("ERROR: Please give valid option");
@@ -126,6 +130,10 @@ public class UserInterface {
 		sqlInteractor.createTableQuery(tableName, columns);
 	}
 
+	/**
+	 * Deletes a table based off user input in java.
+	 * @param sqlInteractor executes sql queries from java
+	 */
 	private void deleteTable(SQLInteractor sqlInteractor) {
 		// Gets name of table user wants to delete
 		System.out.println("What table would you like to delete?");
@@ -168,5 +176,46 @@ public class UserInterface {
 			columnValues[i] = columnValue;
 		}
 		sqlInteractor.addRecordToTable(tableName, columns, columnValues);
+	}
+	
+	/**
+	 * Deletes a record based off user input in java
+	 * @param sqlInteractor executes sql queries from java
+	 */
+	private void deleteRecordFromTable(SQLInteractor sqlInteractor) {
+		System.out.println("What is the table the record is located in?");
+		String tableName = this.scanner.nextLine();
+		
+		// Checks that the table name user gives is accurate
+		if (!sqlInteractor.checkTableExists(tableName)) {
+			System.out.println("ERROR: Table does NOT exist!");
+			return;
+		}
+		
+		// Gets the columns and prints them out for user
+		String[] columns = sqlInteractor.getColumnsOfTable(tableName);
+		System.out.println("From which column do you want to search the record for?"
+				+ "\nThese are the columns: " + Arrays.toString(columns));
+		
+		// Gets the column user wants to search by
+		String criteria = scanner.nextLine().trim();
+		boolean criteriaExists = false;
+		// Checks that user gave a valid column
+		for (int i = 0; i < columns.length; i++) {
+			if (columns[i].equals(criteria)) {
+				criteriaExists = true;
+				break;
+			}
+		}
+		
+		if (!criteriaExists) {
+			// If user gave an invalid column
+			System.out.println("ERROR: Column to search by does NOT exist!");
+		} else {
+			// If user gave a valid column
+			System.out.println("What is the value you want to search for? NOTE: Multiple records with same value in column can be removed.");
+			String valueOfColumn = scanner.nextLine().trim();
+			sqlInteractor.deleteRecord(tableName, criteria, valueOfColumn);
+		}
 	}
 }

@@ -7,8 +7,6 @@ import java.sql.SQLException;
 
 public class Main {
 	// TODO: Implement removing records from Java into SQL
-	// TODO: Implement removing of tables
-	// TODO: Implement viewing of records
 	// TODO: Prevent implementation of empty table name
 	// TODO: Implement better response when fail to make connection
 	// TODO: Let user know if there were no tables if list is empty

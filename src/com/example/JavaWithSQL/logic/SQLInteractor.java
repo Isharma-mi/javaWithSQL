@@ -135,6 +135,29 @@ public class SQLInteractor {
 		}
 	}
 	
+	public void deleteRecord(String tableName, String column, String valueOfColumn) {
+		// TODO: Says sucessfully deleted even if valueOfColumn did not exist
+		
+		// Creates obj that will store query to delete a record
+		StringBuilder cmd = new StringBuilder();
+		cmd.append("DELETE FROM ");
+			cmd.append(tableName);
+		cmd.append(" WHERE ");
+			cmd.append(column);
+			cmd.append(" = '");
+			cmd.append(valueOfColumn);
+			cmd.append("';");
+		
+		try {
+			this.pstmnt = this.connection.prepareStatement(cmd.toString());
+			this.pstmnt.execute();
+			System.out.println("Record(s) were deleted successfully!");
+		} catch (SQLException e) {
+			System.out.println("ERROR: Unable to delete record(s)");
+			e.printStackTrace();
+		}
+	}
+	
 	/**
 	 * Finds the column names of a given table.
 	 * Separate method since need to ask user about each column individually they will add values to
