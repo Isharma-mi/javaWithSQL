@@ -5,7 +5,6 @@ import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.ResultSetMetaData;
 
 public class SQLInteractor {
 	private final Connection connection;
@@ -91,42 +90,45 @@ public class SQLInteractor {
 	
 	/**
 	 * Adds a record to an existing table in SQL server's database.
+	 * @param tableName used to find table to add record to
+	 * @param columns used to tell user what columns values will need to be added to
+	 * @param columnValues used to populate the columns
 	 */
 	public void addRecordToTable(String tableName, String[] columns, String[] columnValues) {
-		StringBuilder cmd =  new StringBuilder();
+		StringBuilder addRecordQuery =  new StringBuilder();
 
 		// Specifies which table we want to insert into
-		cmd.append("INSERT INTO "); 
-		cmd.append(tableName);
-		cmd.append(" (");
+		addRecordQuery.append("INSERT INTO "); 
+		addRecordQuery.append(tableName);
+		addRecordQuery.append(" (");
 		
 		// Adds column names to cmd
 		for (int i = 0; i < columns.length; i++) {
-			cmd.append(columns[i]);
+			addRecordQuery.append(columns[i]);
 			
 			// Checks that there are more elements to add
 			if (!(i == columns.length-1)) {
-				cmd.append(",");
+				addRecordQuery.append(",");
 			}
 		}
 		// Adds values to cmd
-		cmd.append(") VALUES (");
+		addRecordQuery.append(") VALUES (");
 		for (int i = 0; i < columnValues.length; i++) {
 			// Used mainly for String values
 			// Works with ints as well (do it for all types to reduce code w/o negative impact)
-			cmd.append("'");
-			cmd.append(columnValues[i]);
-			cmd.append("'");
+			addRecordQuery.append("'");
+			addRecordQuery.append(columnValues[i]);
+			addRecordQuery.append("'");
 			
 			// Checks that there are more elements to add
 			if (!(i == columnValues.length - 1)) {
-				cmd.append(",");
+				addRecordQuery.append(",");
 			}
 		}
-		cmd.append(")");
+		addRecordQuery.append(")");
 		
 		try {
-			this.pstmnt = this.connection.prepareStatement(cmd.toString());
+			this.pstmnt = this.connection.prepareStatement(addRecordQuery.toString());
 			this.pstmnt.execute();
 			System.out.println("Record was added to " + tableName + " successfully!");
 		} catch (SQLException e) {
@@ -135,28 +137,50 @@ public class SQLInteractor {
 		}
 	}
 	
+	/**
+	 * Deletes a record from an existing table in teh SQL server's database.
+	 * @param tableName used to find table to delete record from
+	 * @param column used to see what column to search record from
+	 * @param valueOfColumn used to find the record(s)
+	 */
 	public void deleteRecord(String tableName, String column, String valueOfColumn) {
-		// TODO: Says sucessfully deleted even if valueOfColumn did not exist
-		
+		// Checks that value exists (done so we can let user know if record could NOT be found)
+		StringBuilder checkValueExistsQuery = new StringBuilder();
+		checkValueExistsQuery.append("SELECT * FROM ");
+			checkValueExistsQuery.append(tableName);
+		checkValueExistsQuery.append(" WHERE ");
+			checkValueExistsQuery.append(column);
+			checkValueExistsQuery.append(" = '");
+			checkValueExistsQuery.append(valueOfColumn);
+			checkValueExistsQuery.append("';");
+
 		// Creates obj that will store query to delete a record
-		StringBuilder cmd = new StringBuilder();
-		cmd.append("DELETE FROM ");
-			cmd.append(tableName);
-		cmd.append(" WHERE ");
-			cmd.append(column);
-			cmd.append(" = '");
-			cmd.append(valueOfColumn);
-			cmd.append("';");
+		StringBuilder deleteRecordQuery = new StringBuilder();
+		deleteRecordQuery.append("DELETE FROM ");
+			deleteRecordQuery.append(tableName);
+		deleteRecordQuery.append(" WHERE ");
+			deleteRecordQuery.append(column);
+			deleteRecordQuery.append(" = '");
+			deleteRecordQuery.append(valueOfColumn);
+			deleteRecordQuery.append("';");
+		
 		
 		try {
-			this.pstmnt = this.connection.prepareStatement(cmd.toString());
-			this.pstmnt.execute();
-			System.out.println("Record(s) were deleted successfully!");
+			this.pstmnt = this.connection.prepareStatement(checkValueExistsQuery.toString(), ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+			this.rs = this.pstmnt.executeQuery();
+			if (!this.rs.isBeforeFirst()) {
+				System.out.println("ERROR: Unable to find record(s)");
+			} else {
+				this.pstmnt = this.connection.prepareStatement(deleteRecordQuery.toString());
+				this.pstmnt.execute();
+				System.out.println("Record(s) were deleted successfully!");
+			}
 		} catch (SQLException e) {
 			System.out.println("ERROR: Unable to delete record(s)");
 			e.printStackTrace();
 		}
 	}
+
 	
 	/**
 	 * Finds the column names of a given table.
