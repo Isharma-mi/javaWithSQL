@@ -6,7 +6,6 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 public class Main {
-	// TODO: Implement removing records from Java into SQL
 	// TODO: Prevent implementation of empty table name
 	// TODO: Implement better response when fail to make connection
 	// TODO: Let user know if there were no tables if list is empty
@@ -37,7 +36,12 @@ public class Main {
 		// For repeatedly asking user what they want to do
 		while (true) {
 			// Can pass in sqlInteractor safely since it can not be null at this pt
-			ui.menuOptions(sqlInteractor);
+			if (ui.askMenuOptions(sqlInteractor)) {
+				continue;
+			} else {
+				// Exits program
+				break;
+			}
 		}
 	}
 }

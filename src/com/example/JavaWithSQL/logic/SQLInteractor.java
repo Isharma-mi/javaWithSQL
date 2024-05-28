@@ -13,7 +13,6 @@ public class SQLInteractor {
 	
 	public SQLInteractor(Connection connection) {
 		this.connection = connection;
-
 	}
 	
 	/**
@@ -44,22 +43,23 @@ public class SQLInteractor {
 	 * @param columns contains Strings that each have the column_name and 
 	 * datatype associated with it
 	 */
-	public void createTableQuery(String tableName, String[] columns) {
+	public void createTable(String tableName, String[] columns) {
 		// Create obj that will store query to create table
-		StringBuilder cmd = new StringBuilder();
-		// Add CREATE to query
-		cmd.append("CREATE TABLE ");
-			// Add name of table to query
-			cmd.append(tableName + " (");
-			// Add each column to query
-			for (int i = 0; i < columns.length; i++) {
-				cmd.append(columns[i] + ", ");
-			}
-			// Add ending to query
-			cmd.append(");");
+		StringBuilder createTableQuery = new StringBuilder();
+		
+		createTableQuery.append("CREATE TABLE ");
+		// Add name of table to query
+		createTableQuery.append(tableName + " (");
+		// Add each column to query
+		for (int i = 0; i < columns.length; i++) {
+			createTableQuery.append(columns[i] + ", ");
+		}
+		// Add ending to query
+		createTableQuery.append(");");
 			
 		try {
-			this.pstmnt = this.connection.prepareStatement(cmd.toString());
+			// Executes query in SQL
+			this.pstmnt = this.connection.prepareStatement(createTableQuery.toString());
 			this.pstmnt.execute();
 			System.out.println(tableName + " table was created successfully");
 		} catch (SQLException e) {
@@ -69,16 +69,18 @@ public class SQLInteractor {
 	}
 	
 	/**
-	 * Deletes a table from the database specified by the user
+	 * Deletes a table specified by the user from the SQL server's database.
 	 * @param tableName used to find table to delete
 	 */
 	public void deleteTable(String tableName) {
 		// Create obj that will store query to delete table
-		StringBuilder cmd = new StringBuilder();
-		cmd.append("DROP TABLE " + tableName);
+		StringBuilder deleteTableQuery = new StringBuilder();
+		// Adds table's name to query
+		deleteTableQuery.append("DROP TABLE " + tableName);
 		
 		try {
-			this.pstmnt = this.connection.prepareStatement(cmd.toString());
+			// Executes query in SQL
+			this.pstmnt = this.connection.prepareStatement(deleteTableQuery.toString());
 			this.pstmnt.execute();
 			System.out.println(tableName + " table was deleted succesfully!");
 		} catch (SQLException e) {
@@ -95,6 +97,7 @@ public class SQLInteractor {
 	 * @param columnValues used to populate the columns
 	 */
 	public void addRecordToTable(String tableName, String[] columns, String[] columnValues) {
+		// Create obj that will store query to create table
 		StringBuilder addRecordQuery =  new StringBuilder();
 
 		// Specifies which table we want to insert into
@@ -102,25 +105,25 @@ public class SQLInteractor {
 		addRecordQuery.append(tableName);
 		addRecordQuery.append(" (");
 		
-		// Adds column names to cmd
+		// Adds column names to query
 		for (int i = 0; i < columns.length; i++) {
 			addRecordQuery.append(columns[i]);
 			
-			// Checks that there are more elements to add
+			// Checks if there are more elements to add
 			if (!(i == columns.length-1)) {
 				addRecordQuery.append(",");
 			}
 		}
-		// Adds values to cmd
+		
+		// Adds values to query
 		addRecordQuery.append(") VALUES (");
 		for (int i = 0; i < columnValues.length; i++) {
-			// Used mainly for String values
-			// Works with ints as well (do it for all types to reduce code w/o negative impact)
+			// Single quotes work with all data types in SQL
 			addRecordQuery.append("'");
 			addRecordQuery.append(columnValues[i]);
 			addRecordQuery.append("'");
 			
-			// Checks that there are more elements to add
+			// Checks if there are more elements to add
 			if (!(i == columnValues.length - 1)) {
 				addRecordQuery.append(",");
 			}
@@ -128,6 +131,7 @@ public class SQLInteractor {
 		addRecordQuery.append(")");
 		
 		try {
+			//Executes query in SQL
 			this.pstmnt = this.connection.prepareStatement(addRecordQuery.toString());
 			this.pstmnt.execute();
 			System.out.println("Record was added to " + tableName + " successfully!");
@@ -138,12 +142,13 @@ public class SQLInteractor {
 	}
 	
 	/**
-	 * Deletes a record from an existing table in teh SQL server's database.
+	 * Deletes a record from an existing table in SQL server's database.
 	 * @param tableName used to find table to delete record from
 	 * @param column used to see what column to search record from
 	 * @param valueOfColumn used to find the record(s)
 	 */
 	public void deleteRecord(String tableName, String column, String valueOfColumn) {
+		// Creates obj that will store query to verify value exists
 		// Checks that value exists (done so we can let user know if record could NOT be found)
 		StringBuilder checkValueExistsQuery = new StringBuilder();
 		checkValueExistsQuery.append("SELECT * FROM ");
@@ -164,14 +169,17 @@ public class SQLInteractor {
 			deleteRecordQuery.append(valueOfColumn);
 			deleteRecordQuery.append("';");
 		
-		
 		try {
+			// Executes value check query in SQL (Insensitive allows for us to move cursor) and stores query's output
 			this.pstmnt = this.connection.prepareStatement(checkValueExistsQuery.toString(), ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
 			this.rs = this.pstmnt.executeQuery();
 			if (!this.rs.isBeforeFirst()) {
+				// If ResultSet is empty (value user wants to delete could not be found)
 				System.out.println("ERROR: Unable to find record(s)");
 			} else {
+				// If ResultSet is not empty (value user wants to delete was found)
 				this.pstmnt = this.connection.prepareStatement(deleteRecordQuery.toString());
+				// Executes value check query in SQL
 				this.pstmnt.execute();
 				System.out.println("Record(s) were deleted successfully!");
 			}
@@ -190,20 +198,20 @@ public class SQLInteractor {
 	 */
 	public String[] getColumnsOfTable(String tableName) {
 		String[] columns = null;
-		StringBuilder cmd = new StringBuilder();
+		// Create obj that will store query to get column all the column names EXCEPT identity for specified table
+		StringBuilder getColumnsQuery = new StringBuilder();
 		
-		// SQL query that gets all the column names EXCEPT identity for specified table
-		cmd.append("SELECT c.name FROM sys.columns AS C"
+		getColumnsQuery.append("SELECT c.name FROM sys.columns AS C"
 				+ "\n JOIN sys.tables AS t"
 				+ "\n ON t.object_id = c.object_id"
 				+ "\n WHERE c.name NOT IN(SELECT name FROM sys.identity_columns WHERE is_identity=1)"
 				+ "\n AND t.name = '");
-			cmd.append(tableName);
-			cmd.append("';");
+			getColumnsQuery.append(tableName);
+			getColumnsQuery.append("';");
 			
 		try {
-			// Loads query from above into PreparedStatement (Insensitive allows for us to move cursor)
-			this.pstmnt = this.connection.prepareStatement(cmd.toString(), ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+			// Executes query in SQL (Insensitive allows for us to move cursor) and stores query's output
+			this.pstmnt = this.connection.prepareStatement(getColumnsQuery.toString(), ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
 			this.rs = this.pstmnt.executeQuery();
 
 			// Puts cursor at last row of result set 
@@ -217,7 +225,7 @@ public class SQLInteractor {
 			// Done since .next() will push cursor to first row at beginning of loop 
 			this.rs.beforeFirst();
 
-			// Used to store column names
+			// Used to store column names in order
 			int tracker = 0;
 			// Loop through each column's name
 			while (rs.next()) {
@@ -234,25 +242,26 @@ public class SQLInteractor {
 	/**
 	 * Checks if a given table name is already in the SQL server's database.
 	 * @param tableName table whose existence is checked for
-	 * @return
+	 * @return boolean letting user know if table exists
 	 */
 	public boolean checkTableExists(String tableName) {
 		boolean tableExists = false;
+		
 		try {
 			// Used to get information about database
 			DatabaseMetaData md = connection.getMetaData();
-			// Checks if the table's name can be found in the database
+			
+			// Used to check if the table's name can be found in the database (ResultSet will have values if table was found)
 			this.rs = md.getTables(null, null, tableName, null);
 
 			if (this.rs.next()) {
-				// Checks if the ResultSet has any values in it (will have one if table's name was found)
+				// If the ResultSet is able to move its cursor (i.e. there are values in it)
 				tableExists = true;
 			}
 		} catch (SQLException e) {
 			System.out.println("ERROR: Unable to check if table exists.");
 			e.printStackTrace();
 		}
-		
 		return tableExists;
 	}
 
