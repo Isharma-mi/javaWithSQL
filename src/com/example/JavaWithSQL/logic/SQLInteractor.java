@@ -189,6 +189,55 @@ public class SQLInteractor {
 		}
 	}
 
+	public void viewRecords(String tableName) {
+		// Creates obj that stores query to view records from a table
+		StringBuilder viewRecordsQuery = new StringBuilder();
+		viewRecordsQuery.append("SELECT * FROM ");
+			viewRecordsQuery.append(tableName);
+			viewRecordsQuery.append(";");
+			
+		try {
+			// Gets name and num of columns in table (Done to get each column's value)
+			String[] columns = this.getColumnsOfTable(tableName);
+			int numColumns = columns.length;
+
+			// Executes query in SQL (Insensitive allows for us to move cursor) and stores query's output
+			this.pstmnt = this.connection.prepareStatement(viewRecordsQuery.toString(), ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+			this.rs = this.pstmnt.executeQuery();
+
+			// Puts cursor right before first row
+			// Done since .next()  will push cursor to first row at beginning of loop
+			this.rs.beforeFirst();
+			
+			// Prints out name of columns
+			System.out.print("\t");
+			for (int i = 0; i < columns.length; i++) {
+				System.out.print(columns[i]);
+				
+				if (i!= columns.length - 1) {
+					System.out.print(", ");
+				}
+			}
+			System.out.println();
+			// Loops thru each record in ResultSet
+			while(this.rs.next()) {
+				// Loops thru each column for each record
+				System.out.print("\t");
+				for (int i = 1; i <= numColumns; i++) {
+					// Prints out of column
+					System.out.print(this.rs.getString(i));
+					if (i != numColumns) {
+						// Adds comma if there are more columns
+						System.out.print(", ");
+					}
+				}
+				System.out.println();
+			}
+		} catch (SQLException e) {
+			System.out.println("ERROR: Unable to get records");
+			e.printStackTrace();
+		}
+	}
 	
 	/**
 	 * Finds the column names of a given table.
