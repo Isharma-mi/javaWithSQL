@@ -10,8 +10,7 @@ public class Main {
 	// TODO: Implement better response when fail to make connection
 	// TODO: Let user know if there were no tables if list is empty
 	public static void main(String[] args) {
-		TestingClass testing = new TestingClass();
-		testing.testingStuff();
+		
 		// Create UI obj for user to interact with
 		final UserInterface ui = new UserInterface();
 		// Create SQLInteractor obj here so we can use it after try block
