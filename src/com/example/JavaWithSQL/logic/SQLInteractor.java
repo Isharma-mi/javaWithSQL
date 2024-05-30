@@ -25,6 +25,11 @@ public class SQLInteractor {
 			// Executes query and stores result of it
 			this.rs = this.pstmnt.executeQuery();
 			
+			if (!this.rs.isBeforeFirst()) {
+				System.out.println("ERROR: No tables have been made!");
+				return;
+			}
+			
 			System.out.println("Table names:");
 			// Loops thru row of the table data 
 			while (this.rs.next()) {
@@ -61,7 +66,7 @@ public class SQLInteractor {
 			// Executes query in SQL
 			this.pstmnt = this.connection.prepareStatement(createTableQuery.toString());
 			this.pstmnt.execute();
-			System.out.println(tableName + " table was created successfully");
+			System.out.println(tableName + " table was created successfully!");
 		} catch (SQLException e) {
 			System.out.println("ERROR: Unable to create table!");
 			e.printStackTrace();
@@ -88,8 +93,7 @@ public class SQLInteractor {
 			e.printStackTrace();
 		}
 	} 
-	
-	
+		
 	/**
 	 * Adds a record to an existing table in SQL server's database.
 	 * @param tableName used to find table to add record to
@@ -189,6 +193,10 @@ public class SQLInteractor {
 		}
 	}
 
+	/**
+	 * Shows the records specified by the user along with the names of the columns at the top
+	 * @param tableName used to find table to view records from
+	 */
 	public void viewRecords(String tableName) {
 		// Creates obj that stores query to view records from a table
 		StringBuilder viewRecordsQuery = new StringBuilder();
@@ -209,6 +217,12 @@ public class SQLInteractor {
 			// Done since .next()  will push cursor to first row at beginning of loop
 			this.rs.beforeFirst();
 			
+			// Checks if there are any records to view
+			if (!this.rs.isBeforeFirst()) {
+				System.out.println("ERROR: Table has no records!");
+				return;
+			}
+			
 			// Prints out name of columns
 			System.out.print("\t");
 			for (int i = 0; i < columns.length; i++) {
@@ -223,10 +237,12 @@ public class SQLInteractor {
 			while(this.rs.next()) {
 				// Loops thru each column for each record
 				System.out.print("\t");
-				for (int i = 1; i <= numColumns; i++) {
+				// Do numColumns + 1 since method to get getColumnsOfTable(tableName) avoids identity column
+				for (int i = 1; i <= numColumns + 1; i++) {
 					// Prints out of column
 					System.out.print(this.rs.getString(i));
-					if (i != numColumns) {
+					// Do numColumns + 1 since method to get getColumnsOfTable(tableName) avoids identity column
+					if (i != numColumns + 1) {
 						// Adds comma if there are more columns
 						System.out.print(", ");
 					}
